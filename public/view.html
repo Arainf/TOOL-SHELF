@@ -91,33 +91,41 @@
     </div>
 
     <script>
-        fetch('/api/inventory')
-            .then(res => res.json())
-            .then(data => {
-                const tbody = document.querySelector('#dataTable tbody');
-                tbody.innerHTML = '';
-                if(data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8">No items in inventory.</td></tr>';
-                    return;
-                }
-                data.forEach(item => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${item.id}</td>
-                        <td>${item.dateToday || ''}</td>
-                        <td><strong>${item.productSKU || ''}</strong></td>
-                        <td>${item.productName || ''}</td>
-                        <td>${item.stocks || ''}</td>
-                        <td>${item.price || ''}</td>
-                        <td>${item.category || ''}</td>
-                        <td>${item.shelfLocation || ''}</td>
-                    `;
-                    tbody.appendChild(tr);
+        function fetchData() {
+            fetch('/api/inventory')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.querySelector('#dataTable tbody');
+                    tbody.innerHTML = '';
+                    if(data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="8">No items in inventory.</td></tr>';
+                        return;
+                    }
+                    data.forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${item.id}</td>
+                            <td>${item.dateToday || ''}</td>
+                            <td><strong>${item.productSKU || ''}</strong></td>
+                            <td>${item.productName || ''}</td>
+                            <td>${item.stocks || ''}</td>
+                            <td>${item.price || ''}</td>
+                            <td>${item.category || ''}</td>
+                            <td>${item.shelfLocation || ''}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(err => {
+                    console.error('Error loading data:', err);
                 });
-            })
-            .catch(err => {
-                document.querySelector('#dataTable tbody').innerHTML = '<tr><td colspan="8" style="color:red;">Error loading data</td></tr>';
-            });
+        }
+
+        // Fetch data immediately when the page loads
+        fetchData();
+
+        // Automatically fetch new data every 3 seconds
+        setInterval(fetchData, 3000);
     </script>
 </body>
 </html>
