@@ -90,6 +90,20 @@
         .btn-secondary:hover {
             background-color: #3c4043;
         }
+        .quick-btn {
+            background-color: #e0e0e0;
+            color: #333;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            width: auto;
+            margin-top: 0;
+        }
+        .quick-btn:hover {
+            background-color: #d0d0d0;
+        }
         #status {
             margin-top: 20px;
             text-align: center;
@@ -160,7 +174,8 @@
 
         <div class="form-group">
             <label for="productName">ProductName</label>
-            <input type="text" id="productName" required>
+            <input type="text" id="productName" list="productNameList" required autocomplete="off">
+            <datalist id="productNameList"></datalist>
         </div>
 
         <div class="form-row">
@@ -204,6 +219,15 @@
             <div class="form-group">
                 <label for="sizeVariant">Size/Variant</label>
                 <input type="text" id="sizeVariant">
+                <div style="margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap;">
+                    <button type="button" class="quick-btn" onclick="document.getElementById('sizeVariant').value='S'">S</button>
+                    <button type="button" class="quick-btn" onclick="document.getElementById('sizeVariant').value='M'">M</button>
+                    <button type="button" class="quick-btn" onclick="document.getElementById('sizeVariant').value='L'">L</button>
+                    <button type="button" class="quick-btn" onclick="document.getElementById('sizeVariant').value='XL'">XL</button>
+                    <button type="button" class="quick-btn" onclick="document.getElementById('sizeVariant').value='Red'">Red</button>
+                    <button type="button" class="quick-btn" onclick="document.getElementById('sizeVariant').value='Black'">Black</button>
+                    <button type="button" class="quick-btn" onclick="document.getElementById('sizeVariant').value='White'">White</button>
+                </div>
             </div>
             <div class="form-group">
                 <label for="shelfLocation">Shelf Location</label>
@@ -242,6 +266,24 @@
         dateTodayInput.value = today;
     }
     setTodayDate();
+
+    // Fetch existing product names for Autocomplete
+    function loadProductNames() {
+        fetch('/api/inventory')
+            .then(res => res.json())
+            .then(data => {
+                const uniqueNames = [...new Set(data.map(item => item.productName).filter(Boolean))];
+                const dataList = document.getElementById('productNameList');
+                dataList.innerHTML = ''; // Clear existing
+                uniqueNames.forEach(name => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    dataList.appendChild(option);
+                });
+            })
+            .catch(err => console.error('Failed to load product names', err));
+    }
+    loadProductNames();
 
     // UUID Generator for preventing duplicate submissions
     function generateUUID() {
@@ -350,6 +392,7 @@
                 form.reset(); // Clear the form
                 setTodayDate(); // Re-fill today's date after reset
                 currentSubmitUUID = generateUUID(); // Generate new UUID for next item
+                loadProductNames(); // Refresh autocomplete list with new item
                 productSkuInput.focus(); // Focus back to SKU 
             } else {
                 throw new Error('Script returned error');
