@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -13,53 +12,52 @@
             background-color: #f0f2f5;
             color: #333;
         }
-
         .container {
             max-width: 500px;
             margin: 0 auto;
             background: white;
             padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
-
         h2 {
             text-align: center;
             margin-top: 0;
             color: #1a73e8;
         }
-
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 15px;
         }
-
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
         }
-
         input[type="text"],
         input[type="number"],
+        input[type="date"],
         textarea {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
             box-sizing: border-box;
             font-size: 16px;
-            /* 16px prevents iOS auto-zoom */
             transition: border-color 0.2s;
         }
-
-        input:focus,
-        textarea:focus {
+        input:focus, textarea:focus {
             outline: none;
             border-color: #1a73e8;
-            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+            box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
         }
-
         button {
             width: 100%;
             padding: 14px;
@@ -73,131 +71,188 @@
             transition: background-color 0.2s;
             margin-top: 10px;
         }
-
         button:hover {
             background-color: #1557b0;
         }
-
         button:disabled {
             background-color: #ccc;
             cursor: not-allowed;
         }
-
         #status {
             margin-top: 20px;
             text-align: center;
             font-weight: bold;
             min-height: 24px;
         }
-
-        .success {
-            color: #0f9d58;
-        }
-
-        .error {
-            color: #d23f31;
-        }
+        .success { color: #0f9d58; }
+        .error { color: #d23f31; }
     </style>
 </head>
-
 <body>
 
-    <div class="container">
-        <h2>Take Inventory</h2>
-        <form id="inventoryForm">
+<div class="container">
+    <h2>Take Inventory</h2>
+    <form id="inventoryForm">
+        
+        <div class="form-group">
+            <label for="productNumber">ProductNumber (Primary Key)</label>
+            <input type="text" id="productNumber" required autofocus>
+        </div>
+        
+        <div class="form-row">
             <div class="form-group">
-                <label for="itemName">Item Name / Barcode</label>
-                <input type="text" id="itemName" name="itemName" required autofocus placeholder="e.g. Red T-Shirt">
+                <label for="productSKU">ProductSKU</label>
+                <input type="text" id="productSKU">
             </div>
             <div class="form-group">
-                <label for="quantity">Quantity</label>
-                <input type="number" id="quantity" name="quantity" required min="0" placeholder="0">
+                <label for="productName">ProductName</label>
+                <input type="text" id="productName" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="dprice">Dprice</label>
+                <input type="number" step="0.01" id="dprice">
             </div>
             <div class="form-group">
-                <label for="location">Location / Aisle (Optional)</label>
-                <input type="text" id="location" name="location" placeholder="e.g. Aisle 4">
+                <label for="wprice">Wprice</label>
+                <input type="number" step="0.01" id="wprice">
             </div>
             <div class="form-group">
-                <label for="notes">Notes (Optional)</label>
-                <textarea id="notes" name="notes" rows="2"></textarea>
+                <label for="price">Price</label>
+                <input type="number" step="0.01" id="price">
             </div>
-            <button type="submit" id="submitBtn">Submit to Google Sheet</button>
-        </form>
-        <div id="status"></div>
-    </div>
+        </div>
 
-    <script>
-        // =========================================================
-        // ⚠️ REPLACE THIS URL WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
-        // =========================================================
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbykZrq5ikJqQp7UXPUr7xeMu6D8xr7TyXPYddK-lpj-12bBqAmW7fIQJ2j4_gCjtzQj/exec';
+        <div class="form-row">
+            <div class="form-group">
+                <label for="stocks">Stocks</label>
+                <input type="number" id="stocks" required>
+            </div>
+            <div class="form-group">
+                <label for="expDate">ExpDate</label>
+                <input type="date" id="expDate">
+            </div>
+        </div>
 
-        const form = document.getElementById('inventoryForm');
-        const statusDiv = document.getElementById('status');
-        const submitBtn = document.getElementById('submitBtn');
-        const itemNameInput = document.getElementById('itemName');
+        <div class="form-row">
+            <div class="form-group">
+                <label for="category">Category</label>
+                <input type="text" id="category">
+            </div>
+            <div class="form-group">
+                <label for="brand">Brand</label>
+                <input type="text" id="brand">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="sizeVariant">Size/Variant</label>
+                <input type="text" id="sizeVariant">
+            </div>
+            <div class="form-group">
+                <label for="shelfLocation">Shelf Location</label>
+                <input type="text" id="shelfLocation">
+            </div>
+        </div>
 
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
+        <div class="form-group">
+            <label for="reorderLevel">Reorder Level</label>
+            <input type="number" id="reorderLevel">
+        </div>
 
-            if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbykZrq5ikJqQp7UXPUr7xeMu6D8xr7TyXPYddK-lpj-12bBqAmW7fIQJ2j4_gCjtzQj/exec') {
-                statusDiv.innerText = '❌ Error: Please set your Apps Script URL in the HTML file.';
-                statusDiv.className = 'error';
-                return;
+        <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea id="notes" rows="2"></textarea>
+        </div>
+
+        <button type="submit" id="submitBtn">Submit to Google Sheet</button>
+    </form>
+    <div id="status"></div>
+</div>
+
+<script>
+    // =========================================================
+    // ⚠️ REPLACE THIS URL WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
+    // =========================================================
+    const APPS_SCRIPT_URL = 'YOUR_WEB_APP_URL_HERE';
+
+    const form = document.getElementById('inventoryForm');
+    const statusDiv = document.getElementById('status');
+    const submitBtn = document.getElementById('submitBtn');
+    const firstInput = document.getElementById('productNumber');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        if (APPS_SCRIPT_URL === 'YOUR_WEB_APP_URL_HERE') {
+             statusDiv.innerText = '❌ Error: Please set your Apps Script URL in the HTML file.';
+             statusDiv.className = 'error';
+             return;
+        }
+
+        // Disable button while submitting
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Submitting...';
+        statusDiv.innerText = '';
+        statusDiv.className = '';
+
+        // Gather data from the form
+        const itemData = {
+            productNumber: document.getElementById('productNumber').value,
+            productSKU: document.getElementById('productSKU').value,
+            productName: document.getElementById('productName').value,
+            dprice: document.getElementById('dprice').value,
+            wprice: document.getElementById('wprice').value,
+            price: document.getElementById('price').value,
+            stocks: document.getElementById('stocks').value,
+            expDate: document.getElementById('expDate').value,
+            category: document.getElementById('category').value,
+            brand: document.getElementById('brand').value,
+            sizeVariant: document.getElementById('sizeVariant').value,
+            shelfLocation: document.getElementById('shelfLocation').value,
+            reorderLevel: document.getElementById('reorderLevel').value,
+            notes: document.getElementById('notes').value
+        };
+
+        // Send data to Google Apps Script
+        fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(itemData),
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.result === 'success') {
+                statusDiv.innerText = '✅ Item added successfully!';
+                statusDiv.className = 'success';
+                form.reset(); // Clear the form
+                firstInput.focus(); // Focus back to first input
+            } else {
+                throw new Error('Script returned error');
             }
-
-            // Disable button while submitting
-            submitBtn.disabled = true;
-            submitBtn.innerText = 'Submitting...';
-            statusDiv.innerText = '';
-            statusDiv.className = '';
-
-            // Gather data from the form
-            const itemData = {
-                itemName: document.getElementById('itemName').value,
-                quantity: document.getElementById('quantity').value,
-                location: document.getElementById('location').value,
-                notes: document.getElementById('notes').value
-            };
-
-            // Send data to Google Apps Script
-            fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(itemData),
-                // We use text/plain to avoid CORS preflight issues with Google Apps Script
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.result === 'success') {
-                        statusDiv.innerText = '✅ Item added successfully!';
-                        statusDiv.className = 'success';
-                        form.reset(); // Clear the form
-                        itemNameInput.focus(); // Focus back to item name for quick entry
-                    } else {
-                        throw new Error('Script returned error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    statusDiv.innerText = '❌ Connection error. Check your URL.';
-                    statusDiv.className = 'error';
-                })
-                .finally(() => {
-                    // Re-enable the button
-                    submitBtn.disabled = false;
-                    submitBtn.innerText = 'Submit to Google Sheet';
-
-                    // Clear success message after 3 seconds
-                    setTimeout(() => {
-                        if (statusDiv.className === 'success') {
-                            statusDiv.innerText = '';
-                        }
-                    }, 3000);
-                });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            statusDiv.innerText = '❌ Connection error. Check your URL.';
+            statusDiv.className = 'error';
+        })
+        .finally(() => {
+            // Re-enable the button
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Submit to Google Sheet';
+            
+            // Clear success message after 3 seconds
+            setTimeout(() => {
+                if (statusDiv.className === 'success') {
+                    statusDiv.innerText = '';
+                }
+            }, 3000);
         });
-    </script>
+    });
+</script>
 
 </body>
-
 </html>
