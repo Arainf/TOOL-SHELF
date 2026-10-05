@@ -306,11 +306,11 @@
         form.addEventListener('submit', function (e) {
             e.preventDefault();
 
-            if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbzZMIPC1PErjTiUREocwRdgL7tRIObohaM4UMzQpqwKOirX0um2eOh2IsY1sjDyD38K/exec') {
-                statusDiv.innerText = '❌ Error: Please set your Apps Script URL in the HTML file.';
-                statusDiv.className = 'error';
-                return;
-            }
+            // if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbzZMIPC1PErjTiUREocwRdgL7tRIObohaM4UMzQpqwKOirX0um2eOh2IsY1sjDyD38K/exec') {
+            //     statusDiv.innerText = '❌ Error: Please set your Apps Script URL in the HTML file.';
+            //     statusDiv.className = 'error';
+            //     return;
+            // }
 
             // Disable button while submitting
             submitBtn.disabled = true;
