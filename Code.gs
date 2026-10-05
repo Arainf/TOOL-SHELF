@@ -9,7 +9,7 @@ function doPost(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 
-  // Append row matching the exact 14 columns you requested
+  // Append row matching the exact 16 columns
   sheet.appendRow([
     itemData.productNumber,
     itemData.productSKU,
@@ -24,7 +24,9 @@ function doPost(e) {
     itemData.sizeVariant,
     itemData.shelfLocation,
     itemData.reorderLevel,
-    itemData.notes
+    itemData.notes,
+    itemData.batchNumber,
+    itemData.dateToday
   ]);
 
   return ContentService.createTextOutput(JSON.stringify({"result":"success"}))

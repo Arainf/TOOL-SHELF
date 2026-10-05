@@ -24,6 +24,8 @@ A lightweight, mobile-friendly web application for taking inventory, backed by G
     *   Shelf Location
     *   Reorder Level
     *   Notes
+    *   BatchNumber
+    *   DateToday
 3.  Click **Extensions > Apps Script**.
 4.  Copy the contents of `Code.gs` and paste it into the editor.
 5.  Click **Deploy > New deployment**.

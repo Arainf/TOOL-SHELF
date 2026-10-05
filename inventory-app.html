@@ -94,6 +94,17 @@
     <h2>Take Inventory</h2>
     <form id="inventoryForm">
         
+        <div class="form-row">
+            <div class="form-group">
+                <label for="dateToday">Date Today</label>
+                <input type="date" id="dateToday" required>
+            </div>
+            <div class="form-group">
+                <label for="batchNumber">Batch Number</label>
+                <input type="text" id="batchNumber">
+            </div>
+        </div>
+
         <div class="form-group">
             <label for="productNumber">ProductNumber (Primary Key)</label>
             <input type="text" id="productNumber" required autofocus>
@@ -183,6 +194,14 @@
     const statusDiv = document.getElementById('status');
     const submitBtn = document.getElementById('submitBtn');
     const firstInput = document.getElementById('productNumber');
+    const dateTodayInput = document.getElementById('dateToday');
+
+    // Auto-fill today's date
+    function setTodayDate() {
+        const today = new Date().toISOString().split('T')[0];
+        dateTodayInput.value = today;
+    }
+    setTodayDate();
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -214,7 +233,9 @@
             sizeVariant: document.getElementById('sizeVariant').value,
             shelfLocation: document.getElementById('shelfLocation').value,
             reorderLevel: document.getElementById('reorderLevel').value,
-            notes: document.getElementById('notes').value
+            notes: document.getElementById('notes').value,
+            batchNumber: document.getElementById('batchNumber').value,
+            dateToday: document.getElementById('dateToday').value
         };
 
         // Send data to Google Apps Script
@@ -229,7 +250,8 @@
                 statusDiv.innerText = '✅ Item added successfully!';
                 statusDiv.className = 'success';
                 form.reset(); // Clear the form
-                firstInput.focus(); // Focus back to first input
+                setTodayDate(); // Re-fill today's date after reset
+                firstInput.focus(); // Focus back to product number
             } else {
                 throw new Error('Script returned error');
             }
