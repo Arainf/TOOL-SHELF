@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Store Inventory</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 0;
+            color: #1a73e8;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            /* 16px prevents iOS auto-zoom */
+            transition: border-color 0.2s;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #1557b0;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #status {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+            min-height: 24px;
+        }
+
+        .success {
+            color: #0f9d58;
+        }
+
+        .error {
+            color: #d23f31;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Take Inventory</h2>
+        <form id="inventoryForm">
+            <div class="form-group">
+                <label for="itemName">Item Name / Barcode</label>
+                <input type="text" id="itemName" name="itemName" required autofocus placeholder="e.g. Red T-Shirt">
+            </div>
+            <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input type="number" id="quantity" name="quantity" required min="0" placeholder="0">
+            </div>
+            <div class="form-group">
+                <label for="location">Location / Aisle (Optional)</label>
+                <input type="text" id="location" name="location" placeholder="e.g. Aisle 4">
+            </div>
+            <div class="form-group">
+                <label for="notes">Notes (Optional)</label>
+                <textarea id="notes" name="notes" rows="2"></textarea>
+            </div>
+            <button type="submit" id="submitBtn">Submit to Google Sheet</button>
+        </form>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // =========================================================
+        // ⚠️ REPLACE THIS URL WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
+        // =========================================================
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbykZrq5ikJqQp7UXPUr7xeMu6D8xr7TyXPYddK-lpj-12bBqAmW7fIQJ2j4_gCjtzQj/exec';
+
+        const form = document.getElementById('inventoryForm');
+        const statusDiv = document.getElementById('status');
+        const submitBtn = document.getElementById('submitBtn');
+        const itemNameInput = document.getElementById('itemName');
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbykZrq5ikJqQp7UXPUr7xeMu6D8xr7TyXPYddK-lpj-12bBqAmW7fIQJ2j4_gCjtzQj/exec') {
+                statusDiv.innerText = '❌ Error: Please set your Apps Script URL in the HTML file.';
+                statusDiv.className = 'error';
+                return;
+            }
+
+            // Disable button while submitting
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Submitting...';
+            statusDiv.innerText = '';
+            statusDiv.className = '';
+
+            // Gather data from the form
+            const itemData = {
+                itemName: document.getElementById('itemName').value,
+                quantity: document.getElementById('quantity').value,
+                location: document.getElementById('location').value,
+                notes: document.getElementById('notes').value
+            };
+
+            // Send data to Google Apps Script
+            fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(itemData),
+                // We use text/plain to avoid CORS preflight issues with Google Apps Script
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.result === 'success') {
+                        statusDiv.innerText = '✅ Item added successfully!';
+                        statusDiv.className = 'success';
+                        form.reset(); // Clear the form
+                        itemNameInput.focus(); // Focus back to item name for quick entry
+                    } else {
+                        throw new Error('Script returned error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    statusDiv.innerText = '❌ Connection error. Check your URL.';
+                    statusDiv.className = 'error';
+                })
+                .finally(() => {
+                    // Re-enable the button
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = 'Submit to Google Sheet';
+
+                    // Clear success message after 3 seconds
+                    setTimeout(() => {
+                        if (statusDiv.className === 'success') {
+                            statusDiv.innerText = '';
+                        }
+                    }, 3000);
+                });
+        });
+    </script>
+
+</body>
+
+</html>
