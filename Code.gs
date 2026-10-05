@@ -9,23 +9,32 @@ function doPost(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 
+  // --- FAST Idempotency Check (Prevent Duplicates) ---
+  if (itemData.uuid) {
+    // Use TextFinder on Column 17 (Q) which is blazing fast in Google Sheets
+    var finder = sheet.getRange("Q:Q").createTextFinder(itemData.uuid).matchEntireCell(true);
+    if (finder.findNext()) {
+      // Duplicate submission found! Return success instantly without adding a new row.
+      return ContentService.createTextOutput(JSON.stringify({"result":"success", "message":"Duplicate prevented"}))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
   // --- Auto-Increment Product Number ---
   var lastRow = sheet.getLastRow();
   var newProductNumber = 1; 
   
   if (lastRow > 1) { 
-    // Look at the last row, 1st column (ProductNumber)
     var lastProductNumberValue = sheet.getRange(lastRow, 1).getValue();
     var parsedNumber = parseInt(lastProductNumberValue, 10);
     if (!isNaN(parsedNumber)) {
       newProductNumber = parsedNumber + 1;
     } else {
-      // Fallback if the previous row was deleted or text was typed manually
       newProductNumber = lastRow; 
     }
   }
 
-  // Append row matching the exact 16 columns
+  // Append row matching the exact 17 columns (Added UUID at the end)
   sheet.appendRow([
     newProductNumber, // Auto-incremented from backend
     itemData.productSKU,
@@ -42,7 +51,8 @@ function doPost(e) {
     itemData.reorderLevel,
     itemData.notes,
     itemData.batchNumber,
-    itemData.dateToday
+    itemData.dateToday,
+    itemData.uuid // Column 17 (Q) - Hidden UUID to prevent duplicates
   ]);
 
   return ContentService.createTextOutput(JSON.stringify({"result":"success"}))
