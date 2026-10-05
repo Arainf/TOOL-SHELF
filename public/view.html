@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Inventory</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+        h2 { margin-top: 0; color: #1a73e8; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        .btn-export {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #0f9d58;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .btn-export:hover { background-color: #0b8043; }
+        .nav {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .nav a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #1a73e8;
+            font-weight: bold;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="/">+ Add Item</a>
+        <a href="/view.html" style="text-decoration: underline;">View Data</a>
+    </div>
+
+    <div class="container">
+        <h2>Inventory Database</h2>
+        <a href="/api/inventory/export" class="btn-export">⬇️ Export to Excel (CSV)</a>
+        
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>SKU</th>
+                    <th>Name</th>
+                    <th>Stocks</th>
+                    <th>Price</th>
+                    <th>Category</th>
+                    <th>Shelf</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="8">Loading data...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        fetch('/api/inventory')
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.querySelector('#dataTable tbody');
+                tbody.innerHTML = '';
+                if(data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8">No items in inventory.</td></tr>';
+                    return;
+                }
+                data.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${item.id}</td>
+                        <td>${item.dateToday || ''}</td>
+                        <td><strong>${item.productSKU || ''}</strong></td>
+                        <td>${item.productName || ''}</td>
+                        <td>${item.stocks || ''}</td>
+                        <td>${item.price || ''}</td>
+                        <td>${item.category || ''}</td>
+                        <td>${item.shelfLocation || ''}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            })
+            .catch(err => {
+                document.querySelector('#dataTable tbody').innerHTML = '<tr><td colspan="8" style="color:red;">Error loading data</td></tr>';
+            });
+    </script>
+</body>
+</html>
