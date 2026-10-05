@@ -327,7 +327,7 @@
             
             html5QrcodeScanner = new Html5QrcodeScanner(
                 "reader",
-                { fps: 10, qrbox: {width: 250, height: 250} },
+                { fps: 30 }, // Removed qrbox so it scans the whole camera view, much better for long barcodes
                 /* verbose= */ false);
                 
             html5QrcodeScanner.render(onScanSuccess, onScanFailure);
