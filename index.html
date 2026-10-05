@@ -151,14 +151,15 @@
 
             <div class="form-group">
                 <label for="productNumber">ProductNumber (Primary Key)</label>
-                <input type="text" id="productNumber" required autofocus>
+                <input type="text" id="productNumber" value="Auto-assigned on submit" disabled
+                    style="background-color: #e9ecef; color: #6c757d; font-style: italic;">
             </div>
 
             <!-- Updated SKU Field with Scan/Gen options -->
             <div class="form-group">
                 <label for="productSKU">ProductSKU</label>
                 <div style="display: flex; gap: 5px;">
-                    <input type="text" id="productSKU" style="flex: 1;" placeholder="Type, Scan, or Gen">
+                    <input type="text" id="productSKU" style="flex: 1;" placeholder="Type, Scan, or Gen" autofocus>
                     <button type="button" id="genSkuBtn" class="btn-secondary">Gen</button>
                     <button type="button" id="scanSkuBtn" class="btn-secondary">Scan</button>
                 </div>
@@ -237,14 +238,13 @@
         // =========================================================
         // ⚠️ REPLACE THIS URL WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
         // =========================================================
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfS2sCG6fWTGOugGq3UDaLdelKDofVNlsAmAtgrW96gjJnIc5pH0t53YcU_bWkTj9v/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZMIPC1PErjTiUREocwRdgL7tRIObohaM4UMzQpqwKOirX0um2eOh2IsY1sjDyD38K/exec';
 
         const form = document.getElementById('inventoryForm');
         const statusDiv = document.getElementById('status');
         const submitBtn = document.getElementById('submitBtn');
-        const firstInput = document.getElementById('productNumber');
-        const dateTodayInput = document.getElementById('dateToday');
         const productSkuInput = document.getElementById('productSKU');
+        const dateTodayInput = document.getElementById('dateToday');
 
         // Auto-fill today's date
         function setTodayDate() {
@@ -306,7 +306,7 @@
         form.addEventListener('submit', function (e) {
             e.preventDefault();
 
-            if (APPS_SCRIPT_URL === 'YOUR_WEB_APP_URL_HERE') {
+            if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbzZMIPC1PErjTiUREocwRdgL7tRIObohaM4UMzQpqwKOirX0um2eOh2IsY1sjDyD38K/exec') {
                 statusDiv.innerText = '❌ Error: Please set your Apps Script URL in the HTML file.';
                 statusDiv.className = 'error';
                 return;
@@ -320,7 +320,6 @@
 
             // Gather data from the form
             const itemData = {
-                productNumber: document.getElementById('productNumber').value,
                 productSKU: productSkuInput.value,
                 productName: document.getElementById('productName').value,
                 dprice: document.getElementById('dprice').value,
@@ -337,6 +336,7 @@
                 batchNumber: document.getElementById('batchNumber').value,
                 dateToday: document.getElementById('dateToday').value
             };
+            // ProductNumber is omitted because the backend auto-generates it now.
 
             // Send data to Google Apps Script
             fetch(APPS_SCRIPT_URL, {
@@ -351,7 +351,7 @@
                         statusDiv.className = 'success';
                         form.reset(); // Clear the form
                         setTodayDate(); // Re-fill today's date after reset
-                        firstInput.focus(); // Focus back to product number
+                        productSkuInput.focus(); // Focus back to SKU 
                     } else {
                         throw new Error('Script returned error');
                     }

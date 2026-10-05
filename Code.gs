@@ -9,9 +9,25 @@ function doPost(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 
+  // --- Auto-Increment Product Number ---
+  var lastRow = sheet.getLastRow();
+  var newProductNumber = 1; 
+  
+  if (lastRow > 1) { 
+    // Look at the last row, 1st column (ProductNumber)
+    var lastProductNumberValue = sheet.getRange(lastRow, 1).getValue();
+    var parsedNumber = parseInt(lastProductNumberValue, 10);
+    if (!isNaN(parsedNumber)) {
+      newProductNumber = parsedNumber + 1;
+    } else {
+      // Fallback if the previous row was deleted or text was typed manually
+      newProductNumber = lastRow; 
+    }
+  }
+
   // Append row matching the exact 16 columns
   sheet.appendRow([
-    itemData.productNumber,
+    newProductNumber, // Auto-incremented from backend
     itemData.productSKU,
     itemData.productName,
     itemData.dprice,
