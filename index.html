@@ -242,8 +242,10 @@
 
     // --- SKU GENERATOR ---
     document.getElementById('genSkuBtn').addEventListener('click', () => {
-        const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
-        productSkuInput.value = 'SKU-' + randomString;
+        // Use current millisecond timestamp + random string for guaranteed uniqueness
+        const timePart = Date.now().toString(36).toUpperCase();
+        const randPart = Math.random().toString(36).substring(2, 5).toUpperCase();
+        productSkuInput.value = 'SKU-' + timePart + '-' + randPart;
     });
 
     // --- BARCODE SCANNER ---
